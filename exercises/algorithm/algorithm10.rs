@@ -2,7 +2,7 @@
 	graph
 	This problem requires you to implement a basic graph functio
 */
-// I AM NOT DONE
+
 
 use std::collections::{HashMap, HashSet};
 use std::fmt;
@@ -30,6 +30,26 @@ impl Graph for UndirectedGraph {
     }
     fn add_edge(&mut self, edge: (&str, &str, i32)) {
         //TODO
+        let (from, to, weight) = edge;
+        
+        // 添加两个节点，如果它们尚未存在
+        self.add_node(from);
+        self.add_node(to);
+        
+        // 添加从 from 到 to 的边
+        if let Some(neighbours) = self.adjacency_table_mutable().get_mut(from) {
+            // 检查是否已经存在这条边，避免重复
+            if !neighbours.iter().any(|(node, w)| node == to && *w == weight) {
+                neighbours.push((to.to_string(), weight));
+            }
+        }
+        
+        // 添加从 to 到 from 的边（因为是无向图）
+        if let Some(neighbours) = self.adjacency_table_mutable().get_mut(to) {
+            if !neighbours.iter().any(|(node, w)| node == from && *w == weight) {
+                neighbours.push((from.to_string(), weight));
+            }
+        }
     }
 }
 pub trait Graph {
@@ -38,10 +58,36 @@ pub trait Graph {
     fn adjacency_table(&self) -> &HashMap<String, Vec<(String, i32)>>;
     fn add_node(&mut self, node: &str) -> bool {
         //TODO
-		true
+		let adjacency = self.adjacency_table_mutable();
+        if adjacency.contains_key(node) {
+            false
+        } else {
+            adjacency.insert(node.to_string(), Vec::new());
+            true
+        }
     }
     fn add_edge(&mut self, edge: (&str, &str, i32)) {
         //TODO
+        let (from, to, weight) = edge;
+        
+        // 添加两个节点，如果它们尚未存在
+        self.add_node(from);
+        self.add_node(to);
+        
+        // 添加从 from 到 to 的边
+        if let Some(neighbours) = self.adjacency_table_mutable().get_mut(from) {
+            // 检查是否已经存在这条边，避免重复
+            if !neighbours.iter().any(|(node, w)| node == to && *w == weight) {
+                neighbours.push((to.to_string(), weight));
+            }
+        }
+        
+        // 添加从 to 到 from 的边（因为是无向图）
+        if let Some(neighbours) = self.adjacency_table_mutable().get_mut(to) {
+            if !neighbours.iter().any(|(node, w)| node == from && *w == weight) {
+                neighbours.push((from.to_string(), weight));
+            }
+        }
     }
     fn contains(&self, node: &str) -> bool {
         self.adjacency_table().get(node).is_some()
